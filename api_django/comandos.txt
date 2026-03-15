@@ -1,0 +1,3 @@
+python manage.py startapp --app-- // para generar la app
+pip install psycopg2 //instalar postgreSQL 
+python manage.py runserver //iniciar el servidor
