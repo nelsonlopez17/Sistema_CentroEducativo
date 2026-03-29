@@ -38,10 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'apps.alumnos',
-    'apps.cursos',
-    'apps.grados',
-    'apps.notas',
+    'apps.academico',
+    'apps.auditoria',
+    'apps.evaluacion',
+    'apps.inscripciones',
+    'apps.organizacion',
     'apps.usuarios',
     'corsheaders',
 ]
@@ -59,7 +60,10 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://172.20.10.4:5173",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'core.urls'
 
@@ -87,13 +91,21 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'sistema_academico', # Nombre que pusiste en tu SQL
-        'USER': 'postgres', # Por defecto suele ser 'postgres'
+        'NAME': 'sistema_academico', 
+        'USER': 'postgres', # 
         'PASSWORD': 'admin',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
 }
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
 
 # Password validation
