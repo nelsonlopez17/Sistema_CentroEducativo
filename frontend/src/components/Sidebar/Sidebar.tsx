@@ -29,36 +29,36 @@ const menuGroups: MenuGroup[] = [
     groupName: 'Gestión de Personas',
     items: [
       { title: 'Alumnos', icon: <FaUserGraduate />, route: '/gestion-alumnos' },
-      { title: 'Docentes', icon: <FaChalkboardTeacher />, route: '#' },
+      { title: 'Docentes', icon: <FaChalkboardTeacher />, route: '/docentes' },
       { title: 'Usuarios', icon: <FaUserShield />, route: '/usuarios' }
     ]
   },
   {
     groupName: 'Estructura Académica',
     items: [
-      { title: 'Grados y Secciones', icon: <FaLayerGroup />, route: '#' },
-      { title: 'Cursos y Pensum', icon: <FaBook />, route: '#' }
+      { title: 'Grados y Secciones', icon: <FaLayerGroup />, route: '/grados-secciones' },
+      { title: 'Cursos y Pensum', icon: <FaBook />, route: '/cursos-pensum' }
     ]
   },
   {
     groupName: 'Procesos',
     items: [
-      { title: 'Inscripciones', icon: <FaClipboardList />, route: '#' },
-      { title: 'Asignaciones', icon: <FaNetworkWired />, route: '#' }
+      { title: 'Inscripciones', icon: <FaClipboardList />, route: '/inscripciones' },
+      { title: 'Asignaciones', icon: <FaNetworkWired />, route: '/asignaciones' }
     ]
   },
   {
     groupName: 'Evaluaciones',
     items: [
-      { title: 'Calificaciones', icon: <FaChartLine />, route: '#' },
-      { title: 'Recuperaciones', icon: <FaBriefcaseMedical />, route: '#' }
+      { title: 'Calificaciones', icon: <FaChartLine />, route: '/calificaciones' },
+      { title: 'Recuperaciones', icon: <FaBriefcaseMedical />, route: '/recuperaciones' }
     ]
   },
   {
     groupName: 'Configuración',
     items: [
-      { title: 'Ciclos y Unidades', icon: <FaCalendarAlt />, route: '#' },
-      { title: 'Auditoría', icon: <FaHistory />, route: '#' }
+      { title: 'Ciclos y Unidades', icon: <FaCalendarAlt />, route: '/ciclos-unidades' },
+      { title: 'Auditoría', icon: <FaHistory />, route: '/auditoria' }
     ]
   }
 ];

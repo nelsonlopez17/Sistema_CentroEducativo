@@ -9,6 +9,14 @@ const routeMap: Record<string, { group: string, name: string }> = {
   '/gestion-alumnos': { group: 'Gestión de Personas', name: 'Alumnos' },
   '/usuarios': { group: 'Gestión de Personas', name: 'Usuarios' },
   '/docentes': { group: 'Gestión de Personas', name: 'Docentes' },
+  '/grados-secciones': { group: 'Estructura Académica', name: 'Grados y Secciones' },
+  '/cursos-pensum': { group: 'Estructura Académica', name: 'Cursos y Pensum' },
+  '/ciclos-unidades': { group: 'Configuración', name: 'Ciclos y Unidades' },
+  '/inscripciones': { group: 'Procesos', name: 'Inscripciones' },
+  '/asignaciones': { group: 'Procesos', name: 'Asignaciones de Cursos' },
+  '/calificaciones': { group: 'Evaluaciones', name: 'Calificaciones' },
+  '/recuperaciones': { group: 'Evaluaciones', name: 'Recuperaciones' },
+  '/auditoria': { group: 'Configuración', name: 'Auditoría' },
 };
 
 const Breadcrumb: React.FC = () => {

@@ -1,0 +1,242 @@
+.calificaciones-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.calificaciones-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.25rem;
+}
+
+.calificaciones-subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Selectores en cascada */
+.selectores-cascade {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background: white;
+  padding: 1.25rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+
+.selector-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 160px;
+}
+
+.selector-group label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sel-input {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: white;
+  color: #374151;
+  width: 100%;
+}
+
+.sel-input:focus {
+  outline: none;
+  border-color: #059669;
+  box-shadow: 0 0 0 2px rgba(5,150,105,0.15);
+}
+
+.sel-input:disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.selector-arrow {
+  color: #d1d5db;
+  font-size: 1.2rem;
+  padding-bottom: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Placeholder */
+.panel-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: white;
+  border-radius: 12px;
+  padding: 4rem 2rem;
+  color: #9ca3af;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+
+.placeholder-icon {
+  font-size: 3rem;
+}
+
+.panel-placeholder p {
+  margin: 0;
+  font-size: 0.9rem;
+  text-align: center;
+  max-width: 400px;
+}
+
+/* Tabla de notas */
+.notas-table-wrapper {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  overflow: hidden;
+}
+
+.notas-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f3f4f6;
+  background: #f9fafb;
+}
+
+.notas-table-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.notas-count {
+  font-size: 0.8rem;
+  background: #d1fae5;
+  color: #065f46;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.notas-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.notas-table th,
+.notas-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.notas-table th {
+  background: #f9fafb;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.notas-table td {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.notas-table tbody tr:hover {
+  background: #f0fdf4;
+}
+
+.td-cui {
+  font-family: monospace;
+  color: #9ca3af;
+  font-size: 0.8rem;
+}
+
+.td-nota {
+  width: 130px;
+}
+
+.nota-input {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.nota-input:focus {
+  outline: none;
+  border-color: #059669;
+  box-shadow: 0 0 0 2px rgba(5,150,105,0.2);
+}
+
+.estado-nota {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.estado-nota.aprobado {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.estado-nota.reprobado {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.estado-nota.pendiente {
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+
+.btn-guardar-nota {
+  background: #059669;
+  color: white;
+  border: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-guardar-nota:hover:not(:disabled) {
+  background: #047857;
+}
+
+.btn-guardar-nota:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  background: white;
+  border-radius: 12px;
+}

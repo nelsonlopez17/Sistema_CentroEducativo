@@ -1,0 +1,139 @@
+.cursos-pensum-container {
+  width: 100%;
+}
+
+.dos-columnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .dos-columnas {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel-header {
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+  padding-bottom: 1rem;
+}
+
+.panel-header h2 {
+  font-size: 1.25rem;
+  color: #111827;
+  margin: 0 0 0.5rem 0;
+}
+
+.panel-header p {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.form-crear-curso {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.form-crear-curso textarea {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.cursos-list-container {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.cursos-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cursos-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  background: #f9fafb;
+}
+
+.cursos-list li:last-child {
+  border-bottom: none;
+}
+
+.curso-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.curso-nombre {
+  font-weight: 500;
+  color: #111827;
+  font-size: 0.9rem;
+}
+
+.curso-desc {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.selector-grado {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 1rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.selector-grado label {
+  font-weight: 600;
+  color: #1e3a8a;
+  font-size: 0.9rem;
+}
+
+.selector-grado select {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #93c5fd;
+  border-radius: 4px;
+  background: white;
+}
+
+.pensum-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-asignar-curso {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.form-asignar-curso select {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+}
+
+.pensum-list-container h3 {
+  font-size: 1rem;
+  color: #374151;
+  margin: 0 0 1rem 0;
+}

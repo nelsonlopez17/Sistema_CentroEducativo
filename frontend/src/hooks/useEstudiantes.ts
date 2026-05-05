@@ -1,80 +1,37 @@
-import { useState, useEffect } from 'react';
-import api from '../api/axios';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { obtenerEstudiantes, crearEstudiante, eliminarEstudiante } from '../api/estudiantes';
 
-interface Persona {
-  id: number;
-  nombres: string;
-  apellidos: string;
-  cui: string;
-  fecha_nacimiento: string;
-  direccion?: string;
-}
+export const useEstudiantes = () => {
+  const queryClient = useQueryClient();
 
-interface Estudiante {
-  id: number;
-  persona: Persona;
-  estado_nombre: string;
-  [key: string]: any;
-}
+  const estudiantesQuery = useQuery({
+    queryKey: ['estudiantes'],
+    queryFn: obtenerEstudiantes,
+  });
 
-interface UseEstudiantesReturn {
-  estudiantes: Estudiante[];
-  loading: boolean;
-  error: string;
-  obtenerEstudiantes: () => Promise<void>;
-}
+  const crearMutation = useMutation({
+    mutationFn: (data: { persona_id: number; estado: number }) => 
+      crearEstudiante(data.persona_id, data.estado),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['estudiantes'] });
+    },
+  });
 
-export const useEstudiantes = (): UseEstudiantesReturn => {
-  const [estudiantes, setEstudiantes] = useState<Estudiante[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const obtenerEstudiantes = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const response = await api.get('estudiantes/');
-      console.log('Respuesta del API (estudiantes):', response.data);
-
-      // Obtener datos completos de cada estudiante
-      const estudiantesConDatos = await Promise.all(
-        response.data.map(async (estudiante: any) => {
-          let estudianteCompleto = { ...estudiante };
-
-          // Obtener datos completos de la persona si es un ID
-          if (typeof estudiante.persona === 'number') {
-            try {
-              const personaResponse = await api.get(`personas/${estudiante.persona}/`);
-              estudianteCompleto.persona = personaResponse.data;
-            } catch (err) {
-              console.error(`Error obteniendo persona ${estudiante.persona}:`, err);
-            }
-          }
-
-          return estudianteCompleto;
-        })
-      );
-
-      console.log('Estudiantes con datos completos:', estudiantesConDatos);
-      setEstudiantes(estudiantesConDatos);
-    } catch (err) {
-      console.error('Error al obtener estudiantes:', err);
-      setError('Error al cargar los estudiantes. Por favor, intenta de nuevo.');
-      setEstudiantes([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Cargar estudiantes al montar el componente
-  useEffect(() => {
-    obtenerEstudiantes();
-  }, []);
+  const eliminarMutation = useMutation({
+    mutationFn: (id: number) => eliminarEstudiante(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['estudiantes'] });
+    },
+  });
 
   return {
-    estudiantes,
-    loading,
-    error,
-    obtenerEstudiantes,
+    estudiantes: estudiantesQuery.data || [],
+    isLoading: estudiantesQuery.isLoading,
+    isError: estudiantesQuery.isError,
+    error: estudiantesQuery.error,
+    crearEstudiante: crearMutation.mutateAsync,
+    isCreating: crearMutation.isPending,
+    eliminarEstudiante: eliminarMutation.mutateAsync,
+    isDeleting: eliminarMutation.isPending,
   };
 };

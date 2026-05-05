@@ -10,9 +10,12 @@ class PersonaSimpleSerializer(serializers.ModelSerializer):
 
 
 class DocenteSerializer(serializers.ModelSerializer):
+    persona = PersonaSimpleSerializer(read_only=True)
+    persona_id = serializers.IntegerField(write_only=True)
+
     class Meta:
         model = Docente
-        fields = '__all__'
+        fields = ['id', 'persona', 'persona_id']
 
 
 class EstadoEstudianteSerializer(serializers.ModelSerializer):
@@ -23,11 +26,12 @@ class EstadoEstudianteSerializer(serializers.ModelSerializer):
 
 class EstudianteSerializer(serializers.ModelSerializer):
     persona = PersonaSimpleSerializer(read_only=True)
+    persona_id = serializers.IntegerField(write_only=True)
     estado_nombre = serializers.CharField(source='estado.nombre', read_only=True)
 
     class Meta:
         model = Estudiante
-        fields = ['id', 'persona', 'estado', 'estado_nombre']
+        fields = ['id', 'persona', 'persona_id', 'estado', 'estado_nombre']
 
 
 class GradoSerializer(serializers.ModelSerializer):
@@ -49,6 +53,9 @@ class CursoSerializer(serializers.ModelSerializer):
 
 
 class PensumSerializer(serializers.ModelSerializer):
+    grado_nombre = serializers.CharField(source='grado.nombre', read_only=True)
+    curso_nombre = serializers.CharField(source='curso.nombre', read_only=True)
+
     class Meta:
         model = Pensum
-        fields = '__all__'
+        fields = ['id', 'grado', 'curso', 'grado_nombre', 'curso_nombre']
