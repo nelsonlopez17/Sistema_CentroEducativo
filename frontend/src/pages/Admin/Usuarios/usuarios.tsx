@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+
 import { useUsuarios } from "../../../hooks/useUsuarios";
 import UsuariosTable from "./UsuariosTable";
 import EditUsuarioModal from "./EditUsuarioModal";
@@ -22,12 +22,11 @@ const rolesDisponibles = [
 ];
 
 const Usuarios: React.FC = () => {
-  const navigate = useNavigate();
   const { usuarios, loading, error, mostrandoUsuarios, obtenerUsuarios, actualizarUsuario } =
     useUsuarios();
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState<Usuario | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [errorModal, setErrorModal] = useState('');
+  const [, setErrorModal] = useState('');
 
   // Cargar usuarios al montar el componente
   useEffect(() => {
@@ -51,14 +50,6 @@ const Usuarios: React.FC = () => {
 
   return (
     <div className="usuarios-container">
-      <nav className="usuarios-nav">
-        <button className="btn-volver" onClick={() => navigate('/inicio')}>
-          ← Volver
-        </button>
-        <h1>Gestión de Usuarios</h1>
-        <div></div>
-      </nav>
-
       <main className="usuarios-main">
         <div className="usuarios-header">
           <h2>Usuarios Registrados</h2>

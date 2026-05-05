@@ -1,0 +1,38 @@
+.breadcrumb-container {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+  gap: 0.5rem;
+}
+
+.breadcrumb-link {
+  color: #6b7280;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  color: #2563eb;
+}
+
+.home-icon {
+  font-size: 1.1rem;
+}
+
+.breadcrumb-separator {
+  font-size: 0.75rem;
+  color: #d1d5db;
+}
+
+.breadcrumb-group {
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.breadcrumb-current {
+  font-weight: 600;
+  color: #111827;
+}

@@ -65,7 +65,7 @@ const EditUsuarioModal: React.FC<EditUsuarioModalProps> = ({
   }, [usuario, isOpen]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, checked } = e.target;
 
     // Validar CUI (máximo 13 caracteres)
     if (name === 'persona.cui' && value.length > 13) {
