@@ -32,9 +32,15 @@ class RolSerializer(serializers.ModelSerializer):
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
+    roles = serializers.SerializerMethodField()
+
     class Meta:
         model = Usuario
-        fields = '__all__'
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'persona', 'roles']
+
+    def get_roles(self, obj):
+        roles = [ur.rol for ur in obj.roles.all()]
+        return RolSerializer(roles, many=True).data
 
 
 class UsuarioRolSerializer(serializers.ModelSerializer):

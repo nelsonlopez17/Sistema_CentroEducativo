@@ -1,5 +1,12 @@
 from rest_framework import serializers
 from .models import Docente, Estudiante, EstadoEstudiante, Grado, Seccion, Curso, Pensum
+from apps.usuarios.models import Persona
+
+
+class PersonaSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Persona
+        fields = ['id', 'nombres', 'apellidos', 'cui', 'fecha_nacimiento', 'direccion']
 
 
 class DocenteSerializer(serializers.ModelSerializer):
@@ -15,9 +22,12 @@ class EstadoEstudianteSerializer(serializers.ModelSerializer):
 
 
 class EstudianteSerializer(serializers.ModelSerializer):
+    persona = PersonaSimpleSerializer(read_only=True)
+    estado_nombre = serializers.CharField(source='estado.nombre', read_only=True)
+
     class Meta:
         model = Estudiante
-        fields = '__all__'
+        fields = ['id', 'persona', 'estado', 'estado_nombre']
 
 
 class GradoSerializer(serializers.ModelSerializer):

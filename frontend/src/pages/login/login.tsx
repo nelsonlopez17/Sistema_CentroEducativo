@@ -1,9 +1,11 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './login.css'; 
 import api from '../../api/axios'
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -14,7 +16,9 @@ const handleLogin = async (e: React.FormEvent) => {
         username,
         password  });
       console.log('Login successful:', response.data);
-      // Aquí puedes guardar el token en localStorage o en el estado global
+      // Guardar el token en localStorage si es necesario
+      // localStorage.setItem('token', response.data.token);
+      navigate('/inicio');
     } catch (error) {
       console.error('Login failed:', error);
       alert('Error al iniciar sesión. Por favor, verifica tus credenciales.');
