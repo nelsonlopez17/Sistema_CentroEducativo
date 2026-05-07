@@ -14,20 +14,12 @@ const CiclosUnidades: React.FC = () => {
 
   const [cicloSeleccionado, setCicloSeleccionado] = useState<CicloEscolar | null>(null);
 
-  // Formulario Ciclo
-  const [nuevoCicloAnio, setNuevoCicloAnio] = useState('');
-  const [nuevoCicloInicio, setNuevoCicloInicio] = useState('');
-  const [nuevoCicloFin, setNuevoCicloFin] = useState('');
+  // Form states
+  const [nuevoCiclo, setNuevoCiclo] = useState({ anio: '', inicio: '', fin: '' });
   const [cicloError, setCicloError] = useState('');
-
-  // Formulario Unidad
-  const [nuevaUnidadNombre, setNuevaUnidadNombre] = useState('');
-  const [nuevaUnidadNumero, setNuevaUnidadNumero] = useState('');
-  const [nuevaUnidadInicio, setNuevaUnidadInicio] = useState('');
-  const [nuevaUnidadFin, setNuevaUnidadFin] = useState('');
+  const [nuevaUnidad, setNuevaUnidad] = useState({ nombre: '', numero: '', inicio: '', fin: '' });
   const [unidadError, setUnidadError] = useState('');
 
-  // Actualizar ciclo seleccionado cuando cambie el cache
   const cicloActualizado = cicloSeleccionado
     ? ciclos.find(c => c.id === cicloSeleccionado.id) || null
     : null;
@@ -37,13 +29,11 @@ const CiclosUnidades: React.FC = () => {
     setCicloError('');
     try {
       await crearCiclo({
-        anio: Number(nuevoCicloAnio),
-        fecha_inicio: nuevoCicloInicio,
-        fecha_fin: nuevoCicloFin,
+        anio: Number(nuevoCiclo.anio),
+        fecha_inicio: nuevoCiclo.inicio,
+        fecha_fin: nuevoCiclo.fin,
       });
-      setNuevoCicloAnio('');
-      setNuevoCicloInicio('');
-      setNuevoCicloFin('');
+      setNuevoCiclo({ anio: '', inicio: '', fin: '' });
     } catch (err: any) {
       setCicloError(err?.response?.data?.anio ? 'Ya existe un ciclo con ese año.' : 'Error al crear el ciclo.');
     }
@@ -61,169 +51,179 @@ const CiclosUnidades: React.FC = () => {
     setUnidadError('');
     try {
       await crearUnidad({
-        nombre: nuevaUnidadNombre,
-        numero: Number(nuevaUnidadNumero),
-        fecha_inicio: nuevaUnidadInicio,
-        fecha_fin: nuevaUnidadFin,
+        nombre: nuevaUnidad.nombre,
+        numero: Number(nuevaUnidad.numero),
+        fecha_inicio: nuevaUnidad.inicio,
+        fecha_fin: nuevaUnidad.fin,
         ciclo: cicloActualizado.id,
       });
-      setNuevaUnidadNombre('');
-      setNuevaUnidadNumero('');
-      setNuevaUnidadInicio('');
-      setNuevaUnidadFin('');
+      setNuevaUnidad({ nombre: '', numero: '', inicio: '', fin: '' });
     } catch (err: any) {
-      setUnidadError(err?.response?.data?.non_field_errors ? 'Ya existe una unidad con ese número en este ciclo.' : 'Error al crear la unidad.');
+      setUnidadError(err?.response?.data?.non_field_errors ? 'Ya existe una unidad con ese número.' : 'Error al crear la unidad.');
     }
   };
 
-  const handleEliminarUnidad = async (id: number) => {
-    if (!window.confirm('¿Eliminar esta unidad?')) return;
-    await eliminarUnidad(id);
-  };
-
   return (
-    <div className="ciclos-container">
-      {/* PANEL IZQUIERDO: Ciclos Escolares */}
-      <div className="ciclos-panel">
-        <div className="panel-header">
-          <h2>Ciclos Escolares</h2>
-        </div>
-
-        {/* Formulario Nuevo Ciclo */}
-        <div className="ciclos-form-card">
-          <h3>Nuevo Ciclo</h3>
-          <form onSubmit={handleCrearCiclo} className="ciclo-form">
-            <div className="form-group">
-              <label>Año *</label>
-              <input
-                type="number"
-                placeholder="Ej. 2026"
-                value={nuevoCicloAnio}
-                onChange={e => setNuevoCicloAnio(e.target.value)}
-                required
-                min={2000}
-                max={2100}
-                className="form-input"
-              />
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Fecha Inicio *</label>
-                <input type="date" value={nuevoCicloInicio} onChange={e => setNuevoCicloInicio(e.target.value)} required className="form-input" />
-              </div>
-              <div className="form-group">
-                <label>Fecha Fin *</label>
-                <input type="date" value={nuevoCicloFin} onChange={e => setNuevoCicloFin(e.target.value)} required className="form-input" />
-              </div>
-            </div>
-            {cicloError && <div className="error-inline">{cicloError}</div>}
-            <button type="submit" className="btn-add" disabled={isCreatingCiclo}>
-              {isCreatingCiclo ? 'Guardando...' : '+ Agregar Ciclo'}
-            </button>
-          </form>
-        </div>
-
-        {/* Lista de Ciclos */}
-        <div className="ciclos-list">
-          {isLoading ? (
-            <div className="loading-state">Cargando ciclos...</div>
-          ) : isError ? (
-            <div className="error-state">Error al cargar ciclos.</div>
-          ) : ciclos.length === 0 ? (
-            <div className="empty-state">No hay ciclos registrados.</div>
-          ) : (
-            ciclos.map(ciclo => (
-              <div
-                key={ciclo.id}
-                className={`ciclo-card ${cicloActualizado?.id === ciclo.id ? 'selected' : ''}`}
-                onClick={() => setCicloSeleccionado(ciclo)}
-              >
-                <div className="ciclo-info">
-                  <span className="ciclo-anio">{ciclo.anio}</span>
-                  <span className="ciclo-fechas">{ciclo.fecha_inicio} → {ciclo.fecha_fin}</span>
-                  <span className="ciclo-badge">{ciclo.unidades_count} {ciclo.unidades_count === 1 ? 'unidad' : 'unidades'}</span>
-                </div>
-                <button
-                  className="btn-eliminar-sm"
-                  onClick={e => { e.stopPropagation(); handleEliminarCiclo(ciclo.id); }}
-                >
-                  ✕
-                </button>
-              </div>
-            ))
-          )}
+    <div className="module-container">
+      <div className="module-header">
+        <div className="header-text">
+          <h1>Cronograma de Ciclos Escolares</h1>
+          <p>Planificación de períodos académicos y unidades de evaluación.</p>
         </div>
       </div>
 
-      {/* PANEL DERECHO: Unidades del Ciclo Seleccionado */}
-      <div className="unidades-panel">
-        {!cicloActualizado ? (
-          <div className="panel-empty">
-            <div className="panel-empty-icon">📅</div>
-            <p>Selecciona un ciclo escolar para gestionar sus unidades.</p>
+      <div className="ciclos-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '32px', marginTop: '24px' }}>
+        
+        {/* PANEL IZQUIERDO: CICLOS */}
+        <div className="panel card">
+          <div className="panel-header-simple" style={{ marginBottom: '24px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700 }}>Apertura de Ciclos</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Define los años lectivos del centro.</p>
           </div>
-        ) : (
-          <>
-            <div className="panel-header">
-              <h2>Unidades del Ciclo {cicloActualizado.anio}</h2>
-              <span className="unidades-count">{cicloActualizado.unidades.length} / 6 unidades</span>
-            </div>
 
-            {/* Formulario Nueva Unidad */}
-            <div className="unidades-form-card">
-              <h3>Agregar Unidad</h3>
-              <form onSubmit={handleCrearUnidad} className="unidad-form">
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Nombre *</label>
-                    <input type="text" placeholder="Ej. Primera Unidad" value={nuevaUnidadNombre} onChange={e => setNuevaUnidadNombre(e.target.value)} required className="form-input" />
-                  </div>
-                  <div className="form-group" style={{ maxWidth: '100px' }}>
-                    <label>Número *</label>
-                    <input type="number" placeholder="1-6" value={nuevaUnidadNumero} onChange={e => setNuevaUnidadNumero(e.target.value)} required min={1} max={6} className="form-input" />
-                  </div>
-                </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Fecha Inicio *</label>
-                    <input type="date" value={nuevaUnidadInicio} onChange={e => setNuevaUnidadInicio(e.target.value)} required className="form-input" />
-                  </div>
-                  <div className="form-group">
-                    <label>Fecha Fin *</label>
-                    <input type="date" value={nuevaUnidadFin} onChange={e => setNuevaUnidadFin(e.target.value)} required className="form-input" />
-                  </div>
-                </div>
-                {unidadError && <div className="error-inline">{unidadError}</div>}
-                <button type="submit" className="btn-add" disabled={isCreatingUnidad || cicloActualizado.unidades.length >= 6}>
-                  {isCreatingUnidad ? 'Guardando...' : '+ Agregar Unidad'}
-                </button>
-              </form>
+          <form onSubmit={handleCrearCiclo} className="module-form-compact" style={{ marginBottom: '32px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="form-group">
+              <label>Año Lectivo</label>
+              <input
+                type="number"
+                className="input-field"
+                placeholder="Ej. 2026"
+                value={nuevoCiclo.anio}
+                onChange={e => setNuevoCiclo({...nuevoCiclo, anio: e.target.value})}
+                required
+              />
             </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="form-group">
+                <label>Inicio</label>
+                <input type="date" className="input-field" value={nuevoCiclo.inicio} onChange={e => setNuevoCiclo({...nuevoCiclo, inicio: e.target.value})} required />
+              </div>
+              <div className="form-group">
+                <label>Fin</label>
+                <input type="date" className="input-field" value={nuevoCiclo.fin} onChange={e => setNuevoCiclo({...nuevoCiclo, fin: e.target.value})} required />
+              </div>
+            </div>
+            {cicloError && <div className="error-message-inline">{cicloError}</div>}
+            <button type="submit" className="btn-primary" disabled={isCreatingCiclo} style={{ width: '100%' }}>
+              {isCreatingCiclo ? 'Aperturando...' : 'Abrir Ciclo Escolar'}
+            </button>
+          </form>
 
-            {/* Lista de Unidades */}
-            <div className="unidades-list">
-              {cicloActualizado.unidades.length === 0 ? (
-                <div className="empty-state">Este ciclo no tiene unidades configuradas.</div>
-              ) : (
-                [...cicloActualizado.unidades]
-                  .sort((a: Unidad, b: Unidad) => a.numero - b.numero)
-                  .map((unidad: Unidad) => (
-                    <div key={unidad.id} className="unidad-card">
-                      <div className="unidad-numero">U{unidad.numero}</div>
-                      <div className="unidad-info">
-                        <span className="unidad-nombre">{unidad.nombre}</span>
-                        <span className="unidad-fechas">{unidad.fecha_inicio} → {unidad.fecha_fin}</span>
-                      </div>
-                      <button className="btn-eliminar-sm" onClick={() => handleEliminarUnidad(unidad.id)}>✕</button>
+          <div className="ciclos-scroll-list" style={{ maxHeight: '350px', overflowY: 'auto' }}>
+            {isLoading ? <p style={{ textAlign: 'center' }}>Cargando...</p> : 
+             ciclos.length === 0 ? <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No hay ciclos registrados.</p> :
+             ciclos.map(ciclo => (
+              <div
+                key={ciclo.id}
+                className={`ciclo-item-card ${cicloActualizado?.id === ciclo.id ? 'active' : ''}`}
+                onClick={() => setCicloSeleccionado(ciclo)}
+                style={{ 
+                  padding: '16px', 
+                  borderRadius: '12px', 
+                  border: '1px solid var(--border-color)', 
+                  marginBottom: '12px',
+                  cursor: 'pointer',
+                  backgroundColor: cicloActualizado?.id === ciclo.id ? 'var(--primary-soft)' : 'white',
+                  borderColor: cicloActualizado?.id === ciclo.id ? 'var(--primary)' : 'var(--border-color)',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 700 }}>Ciclo {ciclo.anio}</h4>
+                  <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>{ciclo.fecha_inicio} a {ciclo.fecha_fin}</p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span className="badge badge-info" style={{ fontSize: '10px' }}>{ciclo.unidades_count} Unidades</span>
+                  <button 
+                    className="btn-icon-action delete" 
+                    onClick={e => { e.stopPropagation(); handleEliminarCiclo(ciclo.id); }}
+                    style={{ background: 'white' }}
+                  >×</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* PANEL DERECHO: UNIDADES */}
+        <div className="panel card">
+          {!cicloActualizado ? (
+            <div style={{ padding: '80px 0', textAlign: 'center', color: 'var(--text-muted)' }}>
+              <span style={{ fontSize: '48px', display: 'block', marginBottom: '20px' }}>🗓️</span>
+              <h3>Gestión de Unidades</h3>
+              <p>Selecciona un ciclo de la izquierda para configurar sus períodos de evaluación.</p>
+            </div>
+          ) : (
+            <div className="animated fadeIn">
+              <div className="panel-header-simple" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h3 style={{ fontSize: '18px', fontWeight: 700 }}>Unidades de Evaluación - {cicloActualizado.anio}</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Configure hasta 6 unidades por ciclo lectivo.</p>
+                </div>
+                <span className="badge badge-success" style={{ padding: '8px 16px' }}>{cicloActualizado.unidades.length} de 6 registradas</span>
+              </div>
+
+              {cicloActualizado.unidades.length < 6 && (
+                <form onSubmit={handleCrearUnidad} className="module-form-compact card" style={{ padding: '20px', backgroundColor: '#f8fafc', marginBottom: '32px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                    <div className="form-group">
+                      <label>Nombre de Unidad</label>
+                      <input type="text" className="input-field" placeholder="Ej. Primer Trimestre" value={nuevaUnidad.nombre} onChange={e => setNuevaUnidad({...nuevaUnidad, nombre: e.target.value})} required />
                     </div>
-                  ))
+                    <div className="form-group">
+                      <label>No. Unidad</label>
+                      <input type="number" className="input-field" placeholder="1-6" value={nuevaUnidad.numero} onChange={e => setNuevaUnidad({...nuevaUnidad, numero: e.target.value})} required min={1} max={6} />
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+                    <div className="form-group">
+                      <label>Fecha Inicio</label>
+                      <input type="date" className="input-field" value={nuevaUnidad.inicio} onChange={e => setNuevaUnidad({...nuevaUnidad, inicio: e.target.value})} required />
+                    </div>
+                    <div className="form-group">
+                      <label>Fecha Fin</label>
+                      <input type="date" className="input-field" value={nuevaUnidad.fin} onChange={e => setNuevaUnidad({...nuevaUnidad, fin: e.target.value})} required />
+                    </div>
+                  </div>
+                  {unidadError && <div className="error-message-inline" style={{ marginBottom: '12px' }}>{unidadError}</div>}
+                  <button type="submit" className="btn-primary" disabled={isCreatingUnidad} style={{ width: '100%' }}>
+                    {isCreatingUnidad ? 'Registrando...' : 'Agregar Período de Evaluación'}
+                  </button>
+                </form>
               )}
+
+              <div className="units-timeline" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {[...cicloActualizado.unidades]
+                  .sort((a, b) => a.numero - b.numero)
+                  .map((unidad) => (
+                    <div key={unidad.id} className="unit-timeline-item" style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+                      <div className="unit-number-blob" style={{ 
+                        width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: 'white', 
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, flexShrink: 0,
+                        boxShadow: '0 4px 10px rgba(124, 58, 237, 0.3)'
+                      }}>
+                        {unidad.numero}
+                      </div>
+                      <div className="unit-card-content card" style={{ flex: 1, padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <h4 style={{ margin: 0, fontSize: '15px' }}>{unidad.nombre}</h4>
+                          <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>Desde el {unidad.fecha_inicio} hasta el {unidad.fecha_fin}</p>
+                        </div>
+                        <button className="btn-icon-action delete" onClick={() => eliminarUnidad(unidad.id)} style={{ background: 'white' }}>×</button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
             </div>
-          </>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
 export default CiclosUnidades;
+

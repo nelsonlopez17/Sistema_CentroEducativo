@@ -11,7 +11,8 @@ export const useCursos = () => {
 
   const crearMutation = useMutation({
     mutationFn: (data: { nombre: string; descripcion?: string }) => 
-      crearCurso(data.nombre, data.descripcion),
+      crearCurso(data),
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cursos'] });
     },

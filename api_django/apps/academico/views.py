@@ -9,7 +9,22 @@ from .serializers import (
 )
 
 
-class DocenteViewSet(viewsets.ModelViewSet):
+from rest_framework.response import Response
+from rest_framework import status
+
+class LogicalDeleteViewSet(viewsets.ModelViewSet):
+    def get_queryset(self):
+        # Por defecto solo mostrar activos
+        return self.queryset.filter(activo=True)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.activo = False
+        instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DocenteViewSet(LogicalDeleteViewSet):
     queryset = Docente.objects.all()
     serializer_class = DocenteSerializer
 
@@ -19,26 +34,26 @@ class EstadoEstudianteViewSet(viewsets.ModelViewSet):
     serializer_class = EstadoEstudianteSerializer
 
 
-class EstudianteViewSet(viewsets.ModelViewSet):
+class EstudianteViewSet(LogicalDeleteViewSet):
     queryset = Estudiante.objects.all()
     serializer_class = EstudianteSerializer
 
 
-class GradoViewSet(viewsets.ModelViewSet):
+class GradoViewSet(LogicalDeleteViewSet):
     queryset = Grado.objects.all()
     serializer_class = GradoSerializer
 
 
-class SeccionViewSet(viewsets.ModelViewSet):
+class SeccionViewSet(LogicalDeleteViewSet):
     queryset = Seccion.objects.all()
     serializer_class = SeccionSerializer
 
 
-class CursoViewSet(viewsets.ModelViewSet):
+class CursoViewSet(LogicalDeleteViewSet):
     queryset = Curso.objects.all()
     serializer_class = CursoSerializer
 
 
 class PensumViewSet(viewsets.ModelViewSet):
     queryset = Pensum.objects.all()
-    serializer_class = PensumSerializer
+    serializer_class = PensumSerializer

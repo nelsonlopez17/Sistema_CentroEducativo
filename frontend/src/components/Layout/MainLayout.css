@@ -1,127 +1,204 @@
+:root {
+    --sidebar-width: 280px;
+    --sidebar-collapsed-width: 80px;
+    --header-height: 72px;
+    --primary-color: #7c3aed;
+    --primary-hover: #6d28d9;
+    --bg-main: #f8fafc;
+    --bg-card: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --radius-lg: 16px;
+}
+
 .main-layout-container {
-  display: flex;
-  min-height: 100vh;
-  background-color: #f9fafb;
-  width: 100%;
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--bg-main);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .main-layout-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* Prevents flex children from overflowing */
+    transition: all 0.3s ease;
 }
 
-/* Header Global */
+/* Header Styles */
 .global-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-  z-index: 10;
-  min-height: 70px;
+    height: var(--header-height);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 50;
 }
 
 .header-left {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 .btn-menu-toggle {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #374151;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.25rem;
-  border-radius: 6px;
-  transition: background-color 0.2s;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
 }
 
 .btn-menu-toggle:hover {
-  background-color: #f3f4f6;
+    background: var(--border-color);
+}
+
+.icon-bar {
+    width: 20px;
+    height: 2px;
+    background: var(--text-main);
+    border-radius: 2px;
 }
 
 .header-right {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
-.ciclo-info {
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 500;
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    transition: background 0.2s;
+    cursor: default;
 }
 
-.btn-logout {
-  background: transparent;
-  color: #ef4444;
-  border: 1px solid #fee2e2;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 0.875rem;
-  transition: all 0.2s;
+.user-info {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
 }
 
-.btn-logout:hover {
-  background: #fef2f2;
-  border-color: #fca5a5;
+.user-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
 }
 
-/* Contenido Central donde carga el Outlet */
+.user-role {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #a78bfa 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 16px;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+
+.divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border-color);
+}
+
+.btn-logout-icon {
+    background: #f1f5f9;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-logout-icon:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #ef4444;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+
+/* Page Content Area */
 .page-content-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 2rem;
-  overflow-y: auto;
+    flex: 1;
+    position: relative;
+    padding: 24px 32px;
 }
 
-/* Footer Global */
+.page-inner-content {
+    animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Footer Styles */
 .global-footer {
-  padding: 1.25rem;
-  text-align: center;
-  color: #9ca3af;
-  font-size: 0.875rem;
-  background-color: #ffffff;
-  border-top: 1px solid #e5e7eb;
+    padding: 20px 32px;
+    background: white;
+    border-top: 1px solid var(--border-color);
 }
 
-.global-footer p {
-  margin: 0;
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 13px;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .page-content-area {
-    padding: 1.5rem;
-  }
-  .ciclo-info {
-    display: none;
-  }
+.footer-content span {
+    color: var(--primary-color);
+    font-weight: 600;
 }
 
-@media (max-width: 480px) {
-  .global-header {
-    padding: 0.75rem 1rem;
-  }
-  .header-left {
-    gap: 0.75rem;
-  }
-  .btn-logout {
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8rem;
-  }
-  .page-content-area {
-    padding: 1rem;
-  }
+.footer-links {
+    display: flex;
+    gap: 16px;
 }
+
+/* Sidebar Responsive Spacing */
+.sidebar-expanded .main-layout-content {
+    margin-left: 0; /* Adjust if sidebar is fixed */
+}
+
+/* If the Sidebar component is position: fixed, we need margin here */
+/* For now assuming it pushes content */

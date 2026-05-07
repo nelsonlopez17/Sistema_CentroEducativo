@@ -53,7 +53,11 @@ const Usuarios: React.FC = () => {
       <main className="usuarios-main">
         <div className="usuarios-header">
           <h2>Usuarios Registrados</h2>
+          <button className="btn-primary" onClick={() => setModalOpen(true)}>
+            <span className="icon">+</span> Nuevo Usuario
+          </button>
         </div>
+
 
         {error && <div className="error-message">{error}</div>}
 

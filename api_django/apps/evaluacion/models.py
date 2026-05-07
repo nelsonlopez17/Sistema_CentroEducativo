@@ -11,7 +11,7 @@ class Nota(models.Model):
     nota = models.DecimalField(max_digits=5, decimal_places=2,
                                validators=[MinValueValidator(0), MaxValueValidator(100)])
     es_mejoramiento = models.BooleanField(default=False)
-    inscripcion = models.ForeignKey(Inscripcion, on_delete=models.CASCADE, related_name='notas')
+    inscripcion = models.ForeignKey(Inscripcion, on_delete=models.RESTRICT, related_name='notas')
     asignacion = models.ForeignKey(AsignacionCurso, on_delete=models.RESTRICT)
     unidad = models.ForeignKey(Unidad, on_delete=models.RESTRICT)
 
@@ -35,7 +35,7 @@ class NotaFinal(models.Model):
                                      validators=[MinValueValidator(0), MaxValueValidator(100)])
     aprobado = models.BooleanField()
     fecha_registro = models.DateField(auto_now_add=True)
-    inscripcion = models.ForeignKey(Inscripcion, on_delete=models.CASCADE)
+    inscripcion = models.ForeignKey(Inscripcion, on_delete=models.RESTRICT)
     asignacion = models.ForeignKey(AsignacionCurso, on_delete=models.RESTRICT)
 
     class Meta:
@@ -47,8 +47,8 @@ class Recuperacion(models.Model):
                                             validators=[MinValueValidator(0), MaxValueValidator(100)])
     aprobado = models.BooleanField()
     fecha_examen = models.DateField()
-    inscripcion = models.ForeignKey(Inscripcion, on_delete=models.CASCADE)
+    inscripcion = models.ForeignKey(Inscripcion, on_delete=models.RESTRICT)
     asignacion = models.ForeignKey(AsignacionCurso, on_delete=models.RESTRICT)
 
     class Meta:
-        unique_together = ('inscripcion', 'asignacion')
+        unique_together = ('inscripcion', 'asignacion')

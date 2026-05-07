@@ -6,6 +6,13 @@ import './Docentes.css';
 const ListaDocentes: React.FC = () => {
   const { docentes, isLoading, isError, error, eliminarDocente } = useDocentes();
   const [modalOpen, setModalOpen] = useState(false);
+  const [selectedDocente, setSelectedDocente] = useState<any>(null);
+
+  const handleEdit = (docente: any) => {
+    setSelectedDocente(docente);
+    setModalOpen(true);
+  };
+
 
   const handleDelete = async (id: number) => {
     if (window.confirm('¿Está seguro de eliminar este docente?')) {
@@ -13,57 +20,95 @@ const ListaDocentes: React.FC = () => {
         await eliminarDocente(id);
       } catch (err) {
         console.error('Error eliminando docente:', err);
-        alert('Ocurrió un error al intentar eliminar el docente.');
       }
     }
   };
 
   return (
-    <div className="docentes-container">
-      <div className="docentes-header">
-        <h2>Listado de Docentes</h2>
-        <button className="btn-nuevo-docente" onClick={() => setModalOpen(true)}>
-          + Nuevo Docente
+    <div className="module-container">
+      <div className="module-header">
+        <div className="header-text">
+          <h1>Gestión de Docentes</h1>
+          <p>Administra el personal académico del centro educativo.</p>
+        </div>
+        <button className="btn-primary" onClick={() => setModalOpen(true)}>
+          <span className="icon">+</span> Nuevo Docente
         </button>
       </div>
 
-      {isLoading ? (
-        <div className="loading-state">Cargando docentes...</div>
-      ) : isError ? (
-        <div className="error-state">
-          Error al cargar los docentes: {error instanceof Error ? error.message : 'Error desconocido'}
+      <div className="module-stats">
+        <div className="stat-card">
+          <span className="stat-label">Total Docentes</span>
+          <span className="stat-value">{docentes.length}</span>
         </div>
-      ) : docentes.length === 0 ? (
-        <div className="empty-state">No hay docentes registrados.</div>
+        {/* More stats could go here */}
+      </div>
+
+      {isLoading ? (
+        <div className="loading-container">
+          <div className="loader"></div>
+          <p>Cargando información académica...</p>
+        </div>
+      ) : isError ? (
+        <div className="error-card">
+          <span className="error-icon">⚠️</span>
+          <p>Error al cargar los docentes: {error instanceof Error ? error.message : 'Error desconocido'}</p>
+        </div>
       ) : (
         <div className="table-container">
-          <table className="docentes-table">
+          <table className="modern-table">
             <thead>
               <tr>
-                <th>CUI</th>
-                <th>Nombres</th>
-                <th>Apellidos</th>
-                <th>Fecha Nacimiento</th>
-                <th>Acciones</th>
+                <th>Identificación (CUI)</th>
+                <th>Nombre Completo</th>
+                <th>Fecha de Nacimiento</th>
+                <th>Estado</th>
+                <th className="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {docentes.map((docente) => (
-                <tr key={docente.id}>
-                  <td>{docente.persona.cui}</td>
-                  <td>{docente.persona.nombres}</td>
-                  <td>{docente.persona.apellidos}</td>
-                  <td>{docente.persona.fecha_nacimiento}</td>
-                  <td className="actions-cell">
-                    <button 
-                      className="btn-eliminar"
-                      onClick={() => handleDelete(docente.id)}
-                    >
-                      Eliminar
-                    </button>
+              {docentes.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="text-center empty-row">
+                    No hay docentes registrados en el sistema.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                docentes.map((docente) => (
+                  <tr key={docente.id}>
+                    <td className="font-mono">{docente.persona.cui}</td>
+                    <td>
+                      <div className="user-cell">
+                        <div className="user-avatar-sm">
+                          {docente.persona.nombres.charAt(0)}
+                        </div>
+                        <div className="user-details">
+                          <span className="user-name-cell">{docente.persona.nombres} {docente.persona.apellidos}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{new Date(docente.persona.fecha_nacimiento).toLocaleDateString()}</td>
+                    <td><span className="badge badge-success">Activo</span></td>
+                    <td className="actions-cell">
+                      <button 
+                        className="btn-icon-action edit" 
+                        title="Editar"
+                        onClick={() => handleEdit(docente)}
+                      >
+                        ✏️
+                      </button>
+
+                      <button 
+                        className="btn-icon-action delete" 
+                        onClick={() => handleDelete(docente.id)}
+                        title="Eliminar"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -71,10 +116,16 @@ const ListaDocentes: React.FC = () => {
 
       <FormularioDocenteModal 
         isOpen={modalOpen} 
-        onClose={() => setModalOpen(false)} 
+        onClose={() => {
+          setModalOpen(false);
+          setSelectedDocente(null);
+        }} 
+        docenteAEditar={selectedDocente}
       />
+
     </div>
   );
 };
 
 export default ListaDocentes;
+

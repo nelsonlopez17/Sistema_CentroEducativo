@@ -9,6 +9,8 @@ from .serializers import NotaSerializer, NotaFinalSerializer, RecuperacionSerial
 class NotaViewSet(viewsets.ModelViewSet):
     queryset = Nota.objects.all()
     serializer_class = NotaSerializer
+    filterset_fields = ['inscripcion', 'asignacion', 'unidad']
+
 
 
 class NotaFinalViewSet(viewsets.ModelViewSet):

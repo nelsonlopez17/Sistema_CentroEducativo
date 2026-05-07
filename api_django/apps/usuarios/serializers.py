@@ -32,15 +32,19 @@ class RolSerializer(serializers.ModelSerializer):
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
+    persona = PersonaSerializer(read_only=True)
     roles = serializers.SerializerMethodField()
 
     class Meta:
         model = Usuario
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'persona', 'roles']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'persona', 'roles', 'is_active']
+
 
     def get_roles(self, obj):
+        # Retornar lista de objetos de roles para que el frontend los use directamente
         roles = [ur.rol for ur in obj.roles.all()]
         return RolSerializer(roles, many=True).data
+
 
 
 class UsuarioRolSerializer(serializers.ModelSerializer):

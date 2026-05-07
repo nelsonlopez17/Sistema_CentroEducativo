@@ -11,10 +11,11 @@ export const obtenerCursos = async (): Promise<Curso[]> => {
   return response.data;
 };
 
-export const crearCurso = async (nombre: string, descripcion: string = ''): Promise<Curso> => {
-  const response = await api.post('/cursos/', { nombre, descripcion });
+export const crearCurso = async (datos: { nombre: string; descripcion?: string }): Promise<Curso> => {
+  const response = await api.post('/cursos/', datos);
   return response.data;
 };
+
 
 export const eliminarCurso = async (id: number): Promise<void> => {
   await api.delete(`/cursos/${id}/`);

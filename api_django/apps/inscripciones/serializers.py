@@ -24,6 +24,26 @@ class InscripcionSerializer(serializers.ModelSerializer):
             'estudiante_cui', 'grado_seccion_str',
         ]
 
+    def validate(self, data):
+        estudiante = data.get('estudiante')
+        grado_seccion = data.get('grado_seccion')
+        
+        if estudiante and grado_seccion:
+            # Buscar si el estudiante ya est inscrito en algn grado_seccion del MISMO ciclo
+            ciclo_actual = grado_seccion.ciclo
+            ya_inscrito = Inscripcion.objects.filter(
+                estudiante=estudiante,
+                grado_seccion__ciclo=ciclo_actual
+            ).exists()
+            
+            if ya_inscrito:
+                raise serializers.ValidationError(
+                    f"El estudiante ya est inscrito en el ciclo {ciclo_actual.anio}."
+                )
+        
+        return data
+
+
 
 class AsignacionCursoSerializer(serializers.ModelSerializer):
     docente_nombre = serializers.CharField(

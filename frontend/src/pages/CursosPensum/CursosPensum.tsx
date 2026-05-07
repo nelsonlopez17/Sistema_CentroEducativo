@@ -5,26 +5,20 @@ import { useGrados } from '../../hooks/useGrados';
 import './CursosPensum.css';
 
 const CursosPensum: React.FC = () => {
-  // Hooks
   const { cursos, crearCurso, eliminarCurso } = useCursos();
   const { grados } = useGrados();
   const { pensumGeneral, crearPensum, eliminarPensum } = usePensum();
 
-  // Estados Locales para Cursos
   const [nuevoCursoNombre, setNuevoCursoNombre] = useState('');
   const [nuevoCursoDesc, setNuevoCursoDesc] = useState('');
-
-  // Estados Locales para Pensum
   const [gradoSeleccionado, setGradoSeleccionado] = useState<number | ''>('');
   const [cursoAAsignar, setCursoAAsignar] = useState<number | ''>('');
 
-  // Filtrar Pensum por Grado Seleccionado
   const pensumDelGrado = useMemo(() => {
     if (!gradoSeleccionado) return [];
     return pensumGeneral.filter(p => p.grado === Number(gradoSeleccionado));
   }, [pensumGeneral, gradoSeleccionado]);
 
-  // Handlers
   const handleCrearCurso = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nuevoCursoNombre.trim()) return;
@@ -33,7 +27,7 @@ const CursosPensum: React.FC = () => {
       setNuevoCursoNombre('');
       setNuevoCursoDesc('');
     } catch (err) {
-      alert('Error al crear el curso');
+      console.error(err);
     }
   };
 
@@ -44,56 +38,65 @@ const CursosPensum: React.FC = () => {
       await crearPensum({ grado: Number(gradoSeleccionado), curso: Number(cursoAAsignar) });
       setCursoAAsignar('');
     } catch (err) {
-      alert('Error al asignar el curso al pensum (puede que ya esté asignado)');
+      console.error(err);
     }
   };
 
   return (
-    <div className="cursos-pensum-container">
-      <div className="dos-columnas">
+    <div className="module-container">
+      <div className="module-header">
+        <div className="header-text">
+          <h1>Cursos y Pensum Académico</h1>
+          <p>Gestiona el catálogo de materias y su asignación por grado.</p>
+        </div>
+      </div>
+
+      <div className="cursos-pensum-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '32px', marginTop: '24px' }}>
         
-        {/* PANEL IZQUIERDO: CATÁLOGO DE CURSOS */}
-        <div className="panel catalogo-cursos-panel">
-          <div className="panel-header">
-            <h2>Catálogo Global de Cursos</h2>
-            <p>Agrega aquí todas las materias que ofrece la institución.</p>
+        {/* PANEL IZQUIERDO: CATÁLOGO */}
+        <div className="panel card">
+          <div className="panel-header-simple" style={{ marginBottom: '24px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700 }}>Catálogo de Cursos</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Definición de materias institucionales.</p>
           </div>
 
-          <form className="form-crear-curso" onSubmit={handleCrearCurso}>
+          <form className="module-form-compact" onSubmit={handleCrearCurso} style={{ marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div className="form-group">
-              <label>Nombre del Curso</label>
+              <label>Nombre de la Materia</label>
               <input 
                 type="text" 
-                placeholder="Ej. Matemáticas" 
+                className="input-field"
+                placeholder="Ej. Ciencias Naturales" 
                 value={nuevoCursoNombre} 
                 onChange={e => setNuevoCursoNombre(e.target.value)} 
                 required 
               />
             </div>
             <div className="form-group">
-              <label>Descripción (Opcional)</label>
+              <label>Descripción</label>
               <textarea 
-                placeholder="Ej. Curso de matemáticas avanzadas..."
+                className="input-field"
+                placeholder="Descripción breve..."
                 value={nuevoCursoDesc}
                 onChange={e => setNuevoCursoDesc(e.target.value)}
                 rows={2}
               />
             </div>
-            <button type="submit" className="btn-submit">Guardar Curso</button>
+            <button type="submit" className="btn-primary" style={{ width: '100%' }}>Guardar en Catálogo</button>
           </form>
 
-          <div className="cursos-list-container">
+          <div className="cursos-list-modern" style={{ maxHeight: '350px', overflowY: 'auto', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
             {cursos.length === 0 ? (
-              <div className="empty-message-small">No hay cursos registrados.</div>
+              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>No hay cursos registrados.</p>
             ) : (
-              <ul className="cursos-list">
+              <ul style={{ listStyle: 'none', padding: 0 }}>
                 {cursos.map(curso => (
-                  <li key={curso.id}>
-                    <div className="curso-info">
-                      <span className="curso-nombre">{curso.nombre}</span>
-                      {curso.descripcion && <span className="curso-desc">{curso.descripcion}</span>}
+                  <li key={curso.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', borderRadius: '10px', backgroundColor: '#f8fafc', marginBottom: '8px' }}>
+                    <div>
+                      <span style={{ fontWeight: 600, display: 'block', fontSize: '14px' }}>{curso.nombre}</span>
+                      <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>ID: {curso.id}</span>
                     </div>
-                    <button onClick={() => eliminarCurso(curso.id)} className="btn-eliminar-small">×</button>
+                    <button onClick={() => eliminarCurso(curso.id)} className="btn-icon-action delete" style={{ background: 'white' }}>×</button>
                   </li>
                 ))}
               </ul>
@@ -101,76 +104,85 @@ const CursosPensum: React.FC = () => {
           </div>
         </div>
 
-        {/* PANEL DERECHO: PENSUM DE ESTUDIOS */}
-        <div className="panel pensum-panel">
-          <div className="panel-header">
-            <h2>Configurador de Pensum</h2>
-            <p>Selecciona un grado para gestionar las materias que lo componen.</p>
+        {/* PANEL DERECHO: PENSUM */}
+        <div className="panel card">
+          <div className="panel-header-simple" style={{ marginBottom: '24px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700 }}>Estructura del Pensum</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Asignación de materias por cada grado académico.</p>
           </div>
 
-          <div className="selector-grado">
-            <label>Grado a configurar:</label>
+          <div className="form-group" style={{ marginBottom: '24px' }}>
+            <label>Seleccionar Grado Académico</label>
             <select 
+              className="input-field"
               value={gradoSeleccionado} 
               onChange={e => setGradoSeleccionado(e.target.value === '' ? '' : Number(e.target.value))}
             >
-              <option value="">-- Seleccione un Grado --</option>
+              <option value="">-- Elija un Grado para editar --</option>
               {grados.map(g => (
                 <option key={g.id} value={g.id}>{g.nombre}</option>
               ))}
             </select>
           </div>
 
-          {!gradoSeleccionado ? (
-            <div className="empty-message">Por favor, selecciona un grado para ver su pensum.</div>
-          ) : (
-            <div className="pensum-content">
-              {/* Formulario para asignar curso */}
-              <form className="form-asignar-curso" onSubmit={handleAsignarCurso}>
-                <select 
-                  value={cursoAAsignar} 
-                  onChange={e => setCursoAAsignar(e.target.value === '' ? '' : Number(e.target.value))} 
-                  required
-                >
-                  <option value="">-- Seleccione un Curso para asignar --</option>
-                  {cursos.map(c => (
-                    <option key={c.id} value={c.id}>{c.nombre}</option>
-                  ))}
-                </select>
-                <button type="submit" className="btn-submit">Asignar</button>
+          {gradoSeleccionado && (
+            <div className="pensum-manager animated fadeIn">
+              <form className="asignacion-form" onSubmit={handleAsignarCurso} style={{ display: 'flex', gap: '12px', marginBottom: '24px', alignItems: 'flex-end' }}>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Materia a incluir</label>
+                  <select 
+                    className="input-field"
+                    value={cursoAAsignar} 
+                    onChange={e => setCursoAAsignar(e.target.value === '' ? '' : Number(e.target.value))} 
+                    required
+                  >
+                    <option value="">-- Seleccionar curso --</option>
+                    {cursos.map(c => (
+                      <option key={c.id} value={c.id}>{c.nombre}</option>
+                    ))}
+                  </select>
+                </div>
+                <button type="submit" className="btn-primary" style={{ padding: '10px 24px', height: '42px' }}>Incluir</button>
               </form>
 
-              {/* Tabla de Pensum */}
-              <div className="pensum-list-container">
-                <h3>Materias asignadas a este grado:</h3>
-                {pensumDelGrado.length === 0 ? (
-                  <div className="empty-message-small">Este grado aún no tiene materias en su pensum.</div>
-                ) : (
-                  <table className="uniones-table">
-                    <thead>
+              <div className="table-container">
+                <table className="modern-table">
+                  <thead>
+                    <tr>
+                      <th>Materia Asignada</th>
+                      <th className="text-center">Quitar</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pensumDelGrado.length === 0 ? (
                       <tr>
-                        <th>Materia (Curso)</th>
-                        <th>Acción</th>
+                        <td colSpan={2} className="text-center empty-row">No hay materias asignadas a este grado.</td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {pensumDelGrado.map(p => (
+                    ) : (
+                      pensumDelGrado.map(p => (
                         <tr key={p.id}>
-                          <td>{p.curso_nombre}</td>
-                          <td style={{ width: '80px', textAlign: 'center' }}>
+                          <td style={{ fontWeight: 600 }}>{p.curso_nombre}</td>
+                          <td className="actions-cell">
                             <button 
-                              className="btn-eliminar-small" 
+                              className="btn-icon-action delete" 
                               onClick={() => eliminarPensum(p.id)}
                             >
-                              Quitar
+                              🗑️
                             </button>
                           </td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
+            </div>
+          )}
+          
+          {!gradoSeleccionado && (
+            <div style={{ padding: '60px 0', textAlign: 'center', color: 'var(--text-muted)' }}>
+              <span style={{ fontSize: '40px', display: 'block', marginBottom: '16px' }}>📚</span>
+              <p>Selecciona un grado para comenzar a gestionar su pensum de estudios.</p>
             </div>
           )}
         </div>
@@ -181,3 +193,4 @@ const CursosPensum: React.FC = () => {
 };
 
 export default CursosPensum;
+

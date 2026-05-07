@@ -18,6 +18,12 @@ export const crearEstudiante = async (persona_id: number, estado: number): Promi
   return response.data;
 };
 
+export const obtenerEstudiantePorId = async (id: number): Promise<Estudiante> => {
+  const response = await api.get(`/estudiantes/${id}/`);
+  return response.data;
+};
+
 export const eliminarEstudiante = async (id: number): Promise<void> => {
   await api.delete(`/estudiantes/${id}/`);
 };
+

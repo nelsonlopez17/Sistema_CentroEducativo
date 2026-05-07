@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import api from '../../api/axios';
 import './Asignaciones.css';
 
-// ── Tipos auxiliares ──────────────────────────────────────────────────────────
 interface GradoSeccion {
   id: number;
   grado: number;
@@ -25,7 +24,6 @@ interface PensumItem {
   curso_nombre: string;
 }
 
-// ── Hooks auxiliares ─────────────────────────────────────────────────────────
 const useGradosSecciones = () => {
   const q = useQuery<GradoSeccion[]>({
     queryKey: ['grado-seccion'],
@@ -42,7 +40,6 @@ const usePensum = () => {
   return { pensum: q.data || [], isLoading: q.isLoading };
 };
 
-// ── Componente Principal ─────────────────────────────────────────────────────
 const Asignaciones: React.FC = () => {
   const { asignaciones, isLoading, isError, crearAsignacion, isCreating, eliminarAsignacion } = useAsignaciones();
   const { docentes } = useDocentes();
@@ -50,11 +47,9 @@ const Asignaciones: React.FC = () => {
   const { gradosSecciones } = useGradosSecciones();
   const { pensum } = usePensum();
 
-  // Filtros de tabla
   const [filtroCiclo, setFiltroCiclo] = useState<number | ''>('');
   const [filtroGradoSeccion, setFiltroGradoSeccion] = useState<number | ''>('');
 
-  // Modal
   const [modalOpen, setModalOpen] = useState(false);
   const [formCiclo, setFormCiclo] = useState<number | ''>('');
   const [formGradoSeccion, setFormGradoSeccion] = useState<number | ''>('');
@@ -62,18 +57,15 @@ const Asignaciones: React.FC = () => {
   const [formPensum, setFormPensum] = useState<number | ''>('');
   const [formError, setFormError] = useState('');
 
-  // Filtrar GradosSecciones por ciclo seleccionado en modal
   const gradosSeccionesPorCicloModal = useMemo(() =>
     formCiclo ? gradosSecciones.filter(gs => gs.ciclo === Number(formCiclo)) : [],
     [gradosSecciones, formCiclo]
   );
 
-  // Filtrar pensum por grado del GradoSeccion seleccionado en modal
   const pensumDisponible = useMemo(() => {
     if (!formGradoSeccion) return [];
     const gs = gradosSecciones.find(g => g.id === Number(formGradoSeccion));
     if (!gs) return [];
-    // Excluir cursos ya asignados en ese grado-seccion
     const cursosYaAsignados = new Set(
       asignaciones
         .filter(a => a.grado_seccion === Number(formGradoSeccion))
@@ -82,7 +74,6 @@ const Asignaciones: React.FC = () => {
     return pensum.filter(p => p.grado === gs.grado && !cursosYaAsignados.has(p.id));
   }, [pensum, gradosSecciones, formGradoSeccion, asignaciones]);
 
-  // Filtros de tabla
   const gradosSeccionesPorFiltroCiclo = useMemo(() =>
     filtroCiclo ? gradosSecciones.filter(gs => gs.ciclo === Number(filtroCiclo)) : gradosSecciones,
     [gradosSecciones, filtroCiclo]
@@ -91,15 +82,16 @@ const Asignaciones: React.FC = () => {
   const asignacionesFiltradas = useMemo(() => {
     return asignaciones.filter(a => {
       if (filtroGradoSeccion && a.grado_seccion !== Number(filtroGradoSeccion)) return false;
+      if (filtroCiclo && !gradosSeccionesPorFiltroCiclo.some(gs => gs.id === a.grado_seccion)) return false;
       return true;
     });
-  }, [asignaciones, filtroGradoSeccion]);
+  }, [asignaciones, filtroGradoSeccion, filtroCiclo, gradosSeccionesPorFiltroCiclo]);
 
   const handleAsignar = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
     if (!formPensum || !formDocente || !formGradoSeccion) {
-      setFormError('Complete todos los campos.');
+      setFormError('Complete todos los campos obligatorios.');
       return;
     }
     try {
@@ -108,124 +100,134 @@ const Asignaciones: React.FC = () => {
         docente: Number(formDocente),
         grado_seccion: Number(formGradoSeccion),
       });
-      setFormCiclo('');
-      setFormGradoSeccion('');
-      setFormDocente('');
-      setFormPensum('');
+      resetForm();
       setModalOpen(false);
     } catch (err: any) {
       setFormError(err?.response?.data?.non_field_errors?.[0] || 'Error al crear la asignación.');
     }
   };
 
+  const resetForm = () => {
+    setFormCiclo('');
+    setFormGradoSeccion('');
+    setFormDocente('');
+    setFormPensum('');
+    setFormError('');
+  };
+
   const handleEliminar = async (id: number) => {
-    if (!window.confirm('¿Eliminar esta asignación?')) return;
+    if (!window.confirm('¿Desea eliminar esta asignación académica?')) return;
     await eliminarAsignacion(id);
   };
 
   return (
-    <div className="asignaciones-container">
-
-      {/* Header */}
-      <div className="asignaciones-header">
-        <div>
-          <h2>Asignaciones de Cursos</h2>
-          <p className="asignaciones-subtitle">
-            {asignaciones.length} asignación{asignaciones.length !== 1 ? 'es' : ''} registrada{asignaciones.length !== 1 ? 's' : ''}
-          </p>
+    <div className="module-container">
+      <div className="module-header">
+        <div className="header-text">
+          <h1>Asignaciones Académicas</h1>
+          <p>Vincula docentes con materias y salones específicos.</p>
         </div>
-        <button className="btn-nueva-asignacion" onClick={() => setModalOpen(true)}>
-          + Nueva Asignación
+        <button className="btn-primary" onClick={() => setModalOpen(true)}>
+          <span className="icon">+</span> Nueva Asignación
         </button>
       </div>
 
-      {/* Filtros */}
-      <div className="filtros-bar">
-        <select
-          className="filtro-select"
-          value={filtroCiclo}
-          onChange={e => {
-            setFiltroCiclo(e.target.value === '' ? '' : Number(e.target.value));
-            setFiltroGradoSeccion('');
-          }}
-        >
-          <option value="">Todos los ciclos</option>
-          {ciclos.map(c => <option key={c.id} value={c.id}>{c.anio}</option>)}
-        </select>
-        <select
-          className="filtro-select"
-          value={filtroGradoSeccion}
-          onChange={e => setFiltroGradoSeccion(e.target.value === '' ? '' : Number(e.target.value))}
-          disabled={gradosSeccionesPorFiltroCiclo.length === 0}
-        >
-          <option value="">Todos los salones</option>
-          {gradosSeccionesPorFiltroCiclo.map(gs => (
-            <option key={gs.id} value={gs.id}>
-              {gs.grado_nombre} - Sección {gs.seccion_nombre} ({gs.ciclo_anio})
-            </option>
-          ))}
-        </select>
+      <div className="filtros-bar card">
+        <div className="select-group" style={{ display: 'flex', gap: '16px', flex: 1 }}>
+          <select
+            className="input-field"
+            value={filtroCiclo}
+            onChange={e => {
+              setFiltroCiclo(e.target.value === '' ? '' : Number(e.target.value));
+              setFiltroGradoSeccion('');
+            }}
+          >
+            <option value="">Todos los Ciclos</option>
+            {ciclos.map(c => <option key={c.id} value={c.id}>Ciclo {c.anio}</option>)}
+          </select>
+          <select
+            className="input-field"
+            value={filtroGradoSeccion}
+            onChange={e => setFiltroGradoSeccion(e.target.value === '' ? '' : Number(e.target.value))}
+            disabled={gradosSeccionesPorFiltroCiclo.length === 0}
+          >
+            <option value="">Todos los Salones</option>
+            {gradosSeccionesPorFiltroCiclo.map(gs => (
+              <option key={gs.id} value={gs.id}>
+                {gs.grado_nombre} - Sección {gs.seccion_nombre}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {/* Tabla */}
-      <div className="table-wrapper">
+      <div className="table-container">
         {isLoading ? (
-          <div className="loading-state">Cargando asignaciones...</div>
+          <div className="loading-container">
+            <div className="loader"></div>
+            <p>Cargando asignaciones...</p>
+          </div>
         ) : isError ? (
-          <div className="error-state">Error al cargar las asignaciones.</div>
-        ) : asignacionesFiltradas.length === 0 ? (
-          <div className="empty-state">No hay asignaciones que coincidan con los filtros.</div>
+          <div className="error-card">⚠️ Error al cargar las asignaciones académicas.</div>
         ) : (
-          <table className="asignaciones-table">
+          <table className="modern-table">
             <thead>
               <tr>
-                <th>Curso</th>
-                <th>Docente</th>
-                <th>Salón</th>
-                <th>Acciones</th>
+                <th>Materia / Curso</th>
+                <th>Docente Asignado</th>
+                <th>Salón / Ciclo</th>
+                <th className="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {asignacionesFiltradas.map(a => (
-                <tr key={a.id}>
-                  <td>
-                    <span className="curso-badge">{a.curso_nombre}</span>
-                  </td>
-                  <td>
-                    <strong>{a.docente_apellido}</strong>, {a.docente_nombre}
-                  </td>
-                  <td>
-                    <span className="salon-badge">{a.grado_seccion_str}</span>
-                  </td>
-                  <td>
-                    <button className="btn-eliminar-as" onClick={() => handleEliminar(a.id)}>
-                      Eliminar
-                    </button>
-                  </td>
+              {asignacionesFiltradas.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="text-center empty-row">No se encontraron asignaciones para los filtros seleccionados.</td>
                 </tr>
-              ))}
+              ) : (
+                asignacionesFiltradas.map(a => (
+                  <tr key={a.id}>
+                    <td>
+                      <span className="badge-info">{a.curso_nombre}</span>
+                    </td>
+                    <td>
+                      <div className="user-cell">
+                        <div className="user-avatar-sm" style={{ backgroundColor: '#f0fdf4', color: '#166534' }}>
+                          {a.docente_nombre.charAt(0)}
+                        </div>
+                        <span className="user-name-cell">{a.docente_apellido}, {a.docente_nombre}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className="badge" style={{ backgroundColor: '#f1f5f9', color: '#475569' }}>
+                        {a.grado_seccion_str}
+                      </span>
+                    </td>
+                    <td className="actions-cell">
+                      <button className="btn-icon-action delete" onClick={() => handleEliminar(a.id)} title="Eliminar Asignación">
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         )}
       </div>
 
-      {/* Modal */}
       {modalOpen && (
         <div className="modal-overlay">
-          <div className="modal-content modal-asignacion">
+          <div className="modal-card">
             <div className="modal-header">
-              <h2>Nueva Asignación de Curso</h2>
-              <button className="modal-close" onClick={() => setModalOpen(false)}>&times;</button>
+              <h3>Nueva Asignación</h3>
+              <button className="btn-close" onClick={() => setModalOpen(false)}>&times;</button>
             </div>
-            <form onSubmit={handleAsignar} className="asignacion-form">
-              <p className="form-instructions">
-                Seleccione el salón, el curso del pensum y el docente que lo impartirá.
-              </p>
-
+            <form onSubmit={handleAsignar} className="modal-form">
               <div className="form-group">
-                <label>Ciclo Escolar *</label>
+                <label>Ciclo Escolar</label>
                 <select
-                  className="form-select"
+                  className="input-field"
                   value={formCiclo}
                   onChange={e => {
                     setFormCiclo(e.target.value === '' ? '' : Number(e.target.value));
@@ -234,7 +236,7 @@ const Asignaciones: React.FC = () => {
                   }}
                   required
                 >
-                  <option value="">-- Seleccione un Ciclo --</option>
+                  <option value="">-- Seleccionar Ciclo --</option>
                   {ciclos.map(c => (
                     <option key={c.id} value={c.id}>{c.anio}</option>
                   ))}
@@ -242,9 +244,9 @@ const Asignaciones: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label>Salón (Grado + Sección) *</label>
+                <label>Salón de Clases</label>
                 <select
-                  className="form-select"
+                  className="input-field"
                   value={formGradoSeccion}
                   onChange={e => {
                     setFormGradoSeccion(e.target.value === '' ? '' : Number(e.target.value));
@@ -253,7 +255,7 @@ const Asignaciones: React.FC = () => {
                   disabled={!formCiclo || gradosSeccionesPorCicloModal.length === 0}
                   required
                 >
-                  <option value="">-- Seleccione un Salón --</option>
+                  <option value="">-- Seleccionar Salón --</option>
                   {gradosSeccionesPorCicloModal.map(gs => (
                     <option key={gs.id} value={gs.id}>
                       {gs.grado_nombre} - Sección {gs.seccion_nombre}
@@ -263,34 +265,31 @@ const Asignaciones: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label>Curso (del Pensum) *</label>
+                <label>Materia (del Pensum)</label>
                 <select
-                  className="form-select"
+                  className="input-field"
                   value={formPensum}
                   onChange={e => setFormPensum(e.target.value === '' ? '' : Number(e.target.value))}
                   disabled={!formGradoSeccion || pensumDisponible.length === 0}
                   required
                 >
-                  <option value="">-- Seleccione un Curso --</option>
+                  <option value="">-- Seleccionar Curso --</option>
                   {pensumDisponible.map(p => (
                     <option key={p.id} value={p.id}>{p.curso_nombre}</option>
                   ))}
                 </select>
-                {formGradoSeccion && pensumDisponible.length === 0 && (
-                  <span className="hint-text">Todos los cursos del pensum ya están asignados en este salón.</span>
-                )}
               </div>
 
               <div className="form-group">
-                <label>Docente *</label>
+                <label>Docente Responsable</label>
                 <select
-                  className="form-select"
+                  className="input-field"
                   value={formDocente}
                   onChange={e => setFormDocente(e.target.value === '' ? '' : Number(e.target.value))}
                   disabled={!formPensum}
                   required
                 >
-                  <option value="">-- Seleccione un Docente --</option>
+                  <option value="">-- Seleccionar Docente --</option>
                   {docentes.map(d => (
                     <option key={d.id} value={d.id}>
                       {d.persona.apellidos}, {d.persona.nombres}
@@ -299,12 +298,12 @@ const Asignaciones: React.FC = () => {
                 </select>
               </div>
 
-              {formError && <div className="error-message">{formError}</div>}
+              {formError && <div className="error-message-inline">{formError}</div>}
 
-              <div className="modal-footer">
-                <button type="button" className="btn-cancel" onClick={() => setModalOpen(false)}>Cancelar</button>
-                <button type="submit" className="btn-submit" disabled={isCreating}>
-                  {isCreating ? 'Guardando...' : 'Crear Asignación'}
+              <div className="modal-actions">
+                <button type="button" className="btn-secondary" onClick={() => { setModalOpen(false); resetForm(); }}>Cancelar</button>
+                <button type="submit" className="btn-primary" disabled={isCreating}>
+                  {isCreating ? 'Asignando...' : 'Confirmar Asignación'}
                 </button>
               </div>
             </form>
@@ -316,3 +315,4 @@ const Asignaciones: React.FC = () => {
 };
 
 export default Asignaciones;
+

@@ -18,6 +18,8 @@ class Persona(models.Model):
     cui = models.CharField(max_length=13, unique=True)
     fecha_nacimiento = models.DateField()
     direccion = models.TextField(blank=True, null=True)
+    activo = models.BooleanField(default=True)
+
 
     def __str__(self):
         return f"{self.nombres} {self.apellidos}"

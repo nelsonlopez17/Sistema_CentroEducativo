@@ -4,9 +4,11 @@ from apps.usuarios.models import Persona
 
 
 class PersonaSimpleSerializer(serializers.ModelSerializer):
+    usuario_id = serializers.IntegerField(source='usuario.id', read_only=True)
+
     class Meta:
         model = Persona
-        fields = ['id', 'nombres', 'apellidos', 'cui', 'fecha_nacimiento', 'direccion']
+        fields = ['id', 'nombres', 'apellidos', 'cui', 'fecha_nacimiento', 'direccion', 'usuario_id']
 
 
 class DocenteSerializer(serializers.ModelSerializer):

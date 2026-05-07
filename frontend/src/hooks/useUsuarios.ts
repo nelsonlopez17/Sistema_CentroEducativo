@@ -96,80 +96,39 @@ export const useUsuarios = (): UseUsuariosReturn => {
 
   const actualizarUsuario = async (usuarioId: number, datos: Partial<Usuario>) => {
     try {
-      // 1. Actualizar datos del usuario (email, is_active)
-      const usuarioPayload: any = {
+      console.log('Actualizando Usuario con datos:', datos);
+
+      // Preparar payload simplificado para el backend mejorado
+      const payload: any = {
         email: datos.email,
         is_active: datos.is_active,
-      };
-
-      console.log('1. Actualizando Usuario con payload:', usuarioPayload);
-
-      try {
-        const usuarioResponse = await api.patch(`usuarios/${usuarioId}/`, usuarioPayload);
-        console.log('✓ Usuario actualizado:', usuarioResponse.data);
-      } catch (usuarioErr: any) {
-        console.error('✗ Error al actualizar usuario:', usuarioErr.response?.data);
-        throw new Error(`Error en usuario: ${JSON.stringify(usuarioErr.response?.data)}`);
-      }
-
-      // 2. Actualizar roles - Enviar directamente los IDs de roles
-      if (datos.roles !== undefined && Array.isArray(datos.roles)) {
-        console.log('2. Actualizando Roles. Roles nuevos:', datos.roles);
-        
-        try {
-          // Extraer solo los IDs de los roles
-          const rolesIds = datos.roles.map((rol: any) => rol.id || rol).filter((id) => id);
-          
-          console.log('IDs de roles a asignar:', rolesIds);
-
-          // Enviar directamente al endpoint de usuarios con los roles
-          const usuarioConRolesPayload = {
-            roles: rolesIds,
-          };
-
-          const rolesResponse = await api.patch(`usuarios/${usuarioId}/`, usuarioConRolesPayload);
-          console.log('✓ Roles actualizados:', rolesResponse.data);
-        } catch (rolesErr: any) {
-          console.error('✗ Error al actualizar roles:', rolesErr.response?.data);
-          // No lanzar error para que no bloquee la actualización de otros datos
-          console.log('Continuando sin actualizar roles...');
-        }
-      }
-
-      // 3. Actualizar datos de la persona si existen
-      if (datos.persona && datos.persona.id) {
-        const personaPayload = {
+        persona: datos.persona ? {
+          id: datos.persona.id,
           nombres: datos.persona.nombres,
           apellidos: datos.persona.apellidos,
           cui: datos.persona.cui,
           fecha_nacimiento: datos.persona.fecha_nacimiento,
-          direccion: datos.persona.direccion || null,
-        };
+          direccion: datos.persona.direccion
+        } : undefined,
+        roles: datos.roles ? datos.roles.map(r => typeof r === 'object' ? r.id : r) : undefined
+      };
 
-        console.log('3. Actualizando Persona con payload:', personaPayload);
+      const response = await api.patch(`usuarios/${usuarioId}/`, payload);
+      console.log('✓ Respuesta exitosa:', response.data);
 
-        try {
-          const personaResponse = await api.patch(`personas/${datos.persona.id}/`, personaPayload);
-          console.log('✓ Persona actualizada:', personaResponse.data);
-        } catch (personaErr: any) {
-          console.error('✗ Error al actualizar persona:', personaErr.response?.data);
-          throw new Error(`Error en persona: ${JSON.stringify(personaErr.response?.data)}`);
-        }
-      }
-
-      // 4. Actualizar el estado local
+      // Actualizar el estado local con la respuesta fresca del servidor
       setUsuarios(
         usuarios.map((usuario) =>
-          usuario.id === usuarioId ? { ...usuario, ...datos } : usuario
+          usuario.id === usuarioId ? { ...usuario, ...response.data } : usuario
         )
       );
 
-      console.log('✓ Cambios guardados exitosamente');
     } catch (err: any) {
-      console.error('❌ Error completo:', err.message);
-      throw err;
+      console.error('❌ Error actualizando usuario:', err.response?.data || err.message);
+      throw new Error(err.response?.data ? JSON.stringify(err.response.data) : err.message);
     }
   };
+
 
   return {
     usuarios,
